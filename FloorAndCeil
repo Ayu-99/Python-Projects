@@ -1,4 +1,4 @@
-# !usr/bin/env python
+#! usr/bin/env python
 # Program to make floor and ceil function by yourself
 
 print("Enter any number:")
