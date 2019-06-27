@@ -1,0 +1,380 @@
+#! /bin/usr/env python
+
+from tkinter import *
+import mysql.connector
+
+
+# from session12 import *
+# from session12 import Customer
+# from session12 import DBHelper
+
+
+class DBHelper:
+    def saveCustomerInDB(self, customer):
+        sql = "insert into Customer values(null, '{}', '{}', '{}', '{}')".format(customer.name, customer.phone,
+                                                                                 customer.email, customer.loyaltyPoints)
+
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        # we can take any name in place of con
+        cursor = con.cursor()  # cursor is used to connect python file to my sql database
+        cursor.execute(sql)
+        con.commit()  # it checks if any command between fails then it automatically fails all the commands
+        # and there is no change in databases
+
+        print(customer.name, " Saved !!")
+
+    def updateCustomerInDB(self, customer):
+        sql = "update Customer  set name = '{}', phone = '{}', email = '{}', loyaltyPoints = '{}'  where cid = {}".format(
+            customer.name, customer.phone, customer.email, customer.loyaltyPoints, customer.cid)
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        # we can take any name in place of con
+        cursor = con.cursor()  # cursor is used to connect python file to my sql database
+        cursor.execute(sql)
+        con.commit()  # it checks if any command between fails then it automatically fails all the commands
+        # and there is no change in databases
+
+        print(customer.name, " Updated !!")
+
+    def deleteCustomerInDB(self, cid):
+        sql = "delete from Customer where cid = {} ".format(cid)
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        # we can take any name in place of con
+        cursor = con.cursor()  # cursor is used to connect python file to my sql database
+        cursor.execute(sql)
+        con.commit()  # it checks if any command between fails then it automatically fails all the commands
+        # and there is no change in databases
+
+        print(cid, " Deleted !!")
+
+    def fetchAllCustomers(self):
+        sql = "select * from Customer order by name desc"
+        # sql = "select * from Customer order by name asc"
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        cursor = con.cursor()
+        cursor.execute(sql)
+        # con.commit()
+
+        # rows = cursor.fetchone()
+        # print(rows)
+
+        rows = cursor.fetchall()
+
+        for row in rows:
+            print(row)  # returns list of tuples
+
+    def fetchCustomer(self, cid):
+        sql = "select * from Customer where cid = {}".format(cid)
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        cursor = con.cursor()
+        cursor.execute(sql)
+
+        rows = cursor.fetchone()
+        print(rows)
+
+    def updateLoyaltyPoints(self, cid):
+        sql = "select loyaltyPoints from Customer where cid = {}".format(cid)
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        cursor = con.cursor()
+        cursor.execute(sql)
+
+        rows = cursor.fetchone()
+        p = rows[0]
+        print(p)
+        q = float(p)
+        print("Enter the amount:")
+        a = int(input())
+        y = q + a*0.1
+        print("Do u want to use the loyalty points??:(yes/no)")
+        ch = input()
+        if choice == "yes":
+            z = y - 150
+
+        else:
+            z = y
+        sql = "update Customer set loyaltyPoints = '{}' where cid = {} ".format(z, cid)
+        con = mysql.connector.connect(user="root", password="", host="127.0.0.1", database="Ayu-1DB")
+        # we can take any name in place of con
+        cursor = con.cursor()  # cursor is used to connect python file to my sql database
+        cursor.execute(sql)
+        con.commit()  # it checks if any command between fails then it automatically fails all the commands
+        # and there is no change in databases
+
+        print(" Updated !!")
+        window = Tk()
+
+        ack = Label(window, text="Loyalty Points Updated")
+
+
+class Customer:
+    def __init__(self, name, phone, email, loyaltyPoints):
+        self.name = name
+        self.phone = phone
+        # self.address = address
+        self.email = email
+        self.loyaltyPoints = loyaltyPoints
+
+    def showCustomerDetails(self):
+        print("Name:>>> {}, Phone:>>> {}".format(self.name, self.phone))
+        print("Email:>>> {}, Loyalty Points:>>> {} ".format(self.email, self.loyaltyPoints))
+
+
+def onClick():
+    y = 0
+    print("Button CLicked!!")
+    print("Enter the amount:>>")
+    a = int(input())
+    c1 = Customer(None, None, None, None)
+    c1.name = entryName.get()
+    c1.phone = entryPhone.get()
+    # c1.address = input("Enter address:")
+    c1.email = entryEmail.get()
+    y = a * 0.1 + 100
+    print("Do u want to use Loyalty Points??(yes/no)")
+    choice = input()
+    if choice == "yes":
+        z = y - 150
+        if z <= 0:
+            print("Sry cannot give loyalty Points :)")
+            c1.loyaltyPoints = y
+            c1.showCustomerDetails()
+            db = DBHelper()
+            db.saveCustomerInDB(c1)
+
+        else:
+            c1.loyaltyPoints = z
+            a = a - 150
+            print("Now, Payable Amount is:₹", a)
+            c1.showCustomerDetails()
+            db = DBHelper()
+            db.saveCustomerInDB(c1)
+
+
+    else:
+        c1.loyaltyPoints = y
+        c1.showCustomerDetails()
+        db = DBHelper()
+        db.saveCustomerInDB(c1)
+
+
+def onClick2():
+    print("Enter the amount:>>")
+    a = int(input())
+    y = 0
+    c1 = Customer(None, None, None, None)
+    c1.cid = entryId.get()
+    # we need to know which customer should be updated
+    c1.name = entryName.get()
+    c1.phone = entryPhone.get()
+    c1.email = entryEmail.get()
+
+    # print("Initial Loyalty Points:>>")
+    # p = int(input())
+    p = int(entryLoyaltyPoints.get())
+    x = 0.1 * a
+    y = p + x
+    print("Do u want to use ur Loyalty Points:(yes/no)")
+    choice = input()
+    if choice == "yes":
+        c1.loyaltyPoints = y - 150
+        if c1.loyaltyPoints <= 0:
+            print("We cannot render u loyalty Points... because of not required no. of Loyalty Points currently !!")
+            print("Sry!!! :( ")
+            c1.loyaltyPoints = y
+            c1.showCustomerDetails()
+            db = DBHelper()
+            db.updateCustomerInDB(c1)
+        else:
+            c1.showCustomerDetails()
+
+            db = DBHelper()
+            a = a - 150
+            print("Now, Payable Amount is:₹", a)
+            db.updateCustomerInDB(c1)
+
+    else:
+
+        c1.loyaltyPoints = y
+        c1.showCustomerDetails()
+
+        db = DBHelper()
+        db.updateCustomerInDB(c1)
+
+    # save = input("Do u like to update the customer(yes/no) ??")
+    # if save == "yes":
+
+
+def onClick3():
+    cid = entryId.get()
+    db = DBHelper()
+    db.deleteCustomerInDB(cid)
+
+
+def onClick4():
+    db = DBHelper()
+    db.fetchAllCustomers()
+
+
+def onClick5():
+    db = DBHelper()
+    db.fetchCustomer(entryId.get())
+
+def onClick6():
+    db = DBHelper()
+    db.updateLoyaltyPoints(entryId.get())
+
+
+print("Enter ur choice:")
+print("1.Create New Customer")
+print("2.Update Customer")
+print("3.Delete Customer")
+print("4.View All Customers")
+print("5.View only one customer")
+print("6.Update Loyalty Points")
+
+choice = int(input())
+if choice == 1:
+
+    window = Tk()
+    window.configure(background="light green")
+    name = Label(window, text="Enter Name:", bg="yellow", fg="black")
+    name.pack()
+
+    entryName = Entry(window)
+    entryName.pack()
+
+    phone = Label(window, text="Add Phone Of Customer:", bg="yellow", fg="black")
+    phone.pack()
+
+    entryPhone = Entry(window)
+    entryPhone.pack()
+
+    email = Label(window, text="Add Email Of Customer:", bg="yellow", fg="black")
+    email.pack()
+
+    entryEmail = Entry(window)
+    entryEmail.pack()
+
+    btnAddCustomer = Button(window, text="ADD CUSTOMER", command=onClick, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+    phone = Label(window, text="Add Phone Of Customer:", bg="yellow", fg="black")
+    phone.pack()
+
+    entryPhone = Entry(window)
+    entryPhone.pack()
+
+    email = Label(window, text="Add Email Of Customer:", bg="yellow", fg="black")
+    email.pack()
+
+    entryEmail = Entry(window)
+    entryEmail.pack()
+
+    btnAddCustomer = Button(window, text="ADD CUSTOMER", command=onClick, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+elif choice == 2:
+    window = Tk()
+    window.configure(background="light green")
+
+    id = Label(window, text="Add Customer ID:", bg="yellow", fg="black")
+    id.pack()
+
+    entryId = Entry(window)
+    entryId.pack()
+
+    title = Label(window, text="Add Updated Customer Details>>", bg="yellow", fg="black")
+    title.pack()
+
+    name = Label(window, text="Add Name Of Customer:", bg="yellow", fg="black")
+    name.pack()
+
+    entryName = Entry(window)
+    entryName.pack()
+
+    phone = Label(window, text="Add Phone Of Customer:", bg="yellow", fg="black")
+    phone.pack()
+
+    entryPhone = Entry(window)
+    entryPhone.pack()
+
+    email = Label(window, text="Add Email Of Customer:", bg="yellow", fg="black")
+    email.pack()
+
+    entryEmail = Entry(window)
+    entryEmail.pack()
+
+    loyaltyPoints = Label(window, text="Enter the current loyalty points:", bg="yellow", fg="black")
+    loyaltyPoints.pack()
+
+    entryLoyaltyPoints = Entry(window)
+    entryLoyaltyPoints.pack()
+
+    btnAddCustomer = Button(window, text="UPDATE CUSTOMER", command=onClick2, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+elif choice == 3:
+    window = Tk()
+    window.configure(background="light green")
+
+    id = Label(window, text="Enter Customer ID to be deleted:", bg="yellow", fg="black")
+    id.pack()
+
+    entryId = Entry(window)
+    entryId.pack()
+
+    btnAddCustomer = Button(window, text="DELETE CUSTOMER", command=onClick3, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+
+elif choice == 4:
+    window = Tk()
+    window.configure(background="light green")
+
+    title = Label(window, text="LIST OF ALL CUSTOMERS>>>", bg="yellow", fg="black")
+    title.pack()
+
+    btnAddCustomer = Button(window, text="VIEW ALL", command=onClick4, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+
+elif choice == 5:
+    window = Tk()
+    window.configure(background="light green")
+
+    id = Label(window, text="Enter Customer ID to be viewed:", bg="yellow", fg="black")
+    id.pack()
+
+    entryId = Entry(window)
+    entryId.pack()
+
+    btnAddCustomer = Button(window, text="VIEW CUSTOMER", command=onClick5, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+else:
+    window = Tk()
+    window.configure(background="light green")
+
+    id = Label(window, text="Enter Customer ID to be viewed:", bg="yellow", fg="black")
+    id.pack()
+
+    entryId = Entry(window)
+    entryId.pack()
+
+    btnAddCustomer = Button(window, text="UPDATE LOYALTY POINTS", command=onClick6, bg="red", fg="black")
+    btnAddCustomer.pack()
+
+    window.mainloop()
+
+
