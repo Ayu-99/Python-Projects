@@ -1,0 +1,81 @@
+#! /bin/usr/env python
+
+ch = 'y'
+while ch == 'y':
+    print("Enter ur name:")
+    name = input()
+    print("Hello", name, "!! Welcome to Hangman Game")
+
+    def findWord(letter):
+        if letter == 5:
+            return 'sorry'
+        elif letter == 6:
+            return 'basket'
+
+        elif letter == 7:
+            return 'curtain'
+
+        elif letter == 8:
+            return 'calamity'
+
+        elif letter == 9:
+            return 'sandglass'
+
+        else:
+            return 'television'
+    print("How many turns do u want ?? >>(1-10)")
+    turns = int(input())
+    print()
+    print("How many letter word u want to guess ?? >> (5-10)")
+    letter = int(input())
+    print()
+
+    word = findWord(letter)
+    correct = []
+    incorrect = []
+    left = letter
+
+    while turns > 0:
+        print("Enter a letter:")
+        c = input()
+        if c in word:
+            print("letter is present in word !! :)")
+            correct.append(c)
+            print("Correctly guessed letters are:", correct)
+            left = left - 1
+            print("Letters left to be guessed are:", left)
+            turns = turns - 1
+            print("Turns left are:", turns)
+            print("********************************************")
+
+        else:
+            print("letter is not present in the word !! :(")
+            incorrect.append(c)
+            print("Your wrongly guesses letters are:", incorrect)
+            turns = turns - 1
+            print("Turns left are:", turns)
+            print("**********************************************")
+
+
+
+    if left == 0:
+        print("Letters in word are:>>")
+        print(correct)
+        print("You have guessed the correct letters. Now enter the word!!")
+        finalWord = input()
+        if word == finalWord:
+            print("Congrats !! U have guessed the right  word!!! :)")
+            print("####################################################")
+
+        else:
+            print("Wrong word :( ")
+            print("####################################################")
+
+    if turns == 0 and left !=0:
+        print("OOPS !! Your turns are finished !!:(")
+        print("########################################################")
+
+    print("Do u want to play again!!!(y/n)")
+    ch = input()
+
+print("Thanks For Playing!! :)")
