@@ -85,7 +85,7 @@ class DBHelper:
         a = int(input())
         y = q + a*0.1
         print("Do u want to use the loyalty points??:(yes/no)")
-        ch = input()
+        choice = input()
         if choice == "yes":
             z = y - 150
 
