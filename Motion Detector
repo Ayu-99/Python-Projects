@@ -1,0 +1,84 @@
+#! /bin/usr/env python
+
+import cv2, time
+import pandas as pd
+from datetime import datetime
+firstF = None
+
+times = []
+
+#firstF = None
+list = [None, None]
+#times = []
+df = pd.DataFrame(columns=["Start", "End"])
+
+#  Here zero means that you have to use ur own bulit-in camera
+video = cv2.VideoCapture(0)
+
+while True:
+    check, frame = video.read()
+    status = 0
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (21, 21), 0)
+
+# When video will start this will store the first frame
+    if firstF is None:
+        firstF = gray
+        continue
+
+# This frame calculates the difference between the first frame and subsequent frames
+    delta_frame = cv2.absdiff(firstF, gray)
+    thresh_delta = cv2.threshold(delta_frame, 30, 255, cv2.THRESH_BINARY)[1]
+    thresh_delta = cv2.dilate(thresh_delta, None, iterations=0)
+    contours, heirarchy = cv2.findContours(thresh_delta.copy(),
+                                    cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+
+    for contour in contours:
+         if cv2.contourArea(contour) < 10000:
+            continue
+         status = 1
+
+         (x, y, w, h) = cv2.boundingRect(contour)
+         cv2.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 3)
+
+
+    list.append(status)
+
+    list = list[-2:]
+
+
+    if list[-1] == 1 and list[-2] == 0:
+        times.append(datetime.now())
+    if list[-1] == 0 and list[-2] == 1:
+        times.append(datetime.now())
+
+
+
+
+
+
+    cv2.imshow('frame', frame)
+    cv2.imshow('Capturing', gray)
+    cv2.imshow('delta', delta_frame)
+    cv2.imshow('thresh', thresh_delta)
+
+    key = cv2.waitKey(1)
+    if key == ord('q'):
+        break
+
+
+for i in range(0, len(times), 2):
+    df = df.append({"Start":times[i], "End":times[i + 1]}, ignore_index = True)
+
+
+df.to_csv("Times of Movement.csv")
+
+
+
+video.release()
+
+cv2.destroyAllWindows()
+
+
+
