@@ -10,7 +10,7 @@ response = requests.get(url)
 
 soup = BeautifulSoup(response.text, "html.parser")
 
-print("////////////////////////////////////////////////")
+print("/"*30)
 
 tags1 = soup.find_all("td", class_="ratingColumn")
 rating = []
